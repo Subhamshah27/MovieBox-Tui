@@ -1,0 +1,45 @@
+name: Desktop Windows Build
+
+on:
+  push:
+    branches: [main, desktop-gui-foundation]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build desktop app
+        run: cargo build --locked --release --bin moviebox-desktop
+
+      - name: Package portable executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item target/release/moviebox-desktop.exe dist/
+          @"
+          MovieBox Desktop preview
+
+          Run moviebox-desktop.exe to launch the graphical interface.
+          This preview currently provides the desktop UI shell. Streaming/provider
+          actions and the installer are not yet integrated.
+          "@ | Set-Content dist/README.txt
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: moviebox-desktop-windows-preview
+          path: dist/
+          if-no-files-found: error
