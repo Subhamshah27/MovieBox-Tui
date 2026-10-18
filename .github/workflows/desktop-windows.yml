@@ -24,7 +24,7 @@ jobs:
       - name: Build desktop app
         run: cargo build --release --bin moviebox-desktop
 
-      - name: Package portable executable
+      - name: Prepare portable package
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
@@ -33,13 +33,27 @@ jobs:
           MovieBox Desktop preview
 
           Run moviebox-desktop.exe to launch the graphical interface.
-          This preview currently provides the desktop UI shell. Streaming/provider
-          actions and the installer are not yet integrated.
+          This is an early UI preview. Provider search, streaming, playback,
+          downloads and library actions are not connected yet.
           "@ | Set-Content dist/README.txt
 
-      - name: Upload Windows build
+      - name: Install Inno Setup
+        run: choco install innosetup --yes --no-progress
+
+      - name: Build Windows installer
+        shell: pwsh
+        run: |
+          $iscc = "$env:ProgramFiles(x86)\Inno Setup 6\ISCC.exe"
+          if (!(Test-Path $iscc)) { throw "Inno Setup compiler not found at $iscc" }
+          & $iscc "packaging/windows/MovieBoxDesktop.iss"
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
+
+      - name: Upload Windows downloads
         uses: actions/upload-artifact@v4
         with:
           name: moviebox-desktop-windows-preview
-          path: dist/
+          path: |
+            dist/moviebox-desktop.exe
+            dist/README.txt
+            dist/MovieBox-Desktop-Setup.exe
           if-no-files-found: error
