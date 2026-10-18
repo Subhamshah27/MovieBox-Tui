@@ -60,10 +60,15 @@ flate2 = "1.0.35"
 tar = "0.4.44"
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 tempfile = "3.17.1"
+eframe = { version = "0.31", default-features = false, features = ["default_fonts", "glow", "x11", "wayland"] }
 
 [lib]
 name = "moviebox_tui"
 path = "src/lib.rs"
+
+[[bin]]
+name = "moviebox-desktop"
+path = "src/bin/desktop.rs"
 
 [lints.clippy]
 collapsible_else_if = "allow"
