@@ -33,8 +33,8 @@ jobs:
           MovieBox Desktop preview
 
           Run moviebox-desktop.exe to launch the graphical interface.
-          This is an early UI preview. Provider search, streaming, playback,
-          downloads and library actions are not connected yet.
+          This is an early preview. Search is wired to the existing provider service;
+          playback, downloads and the remaining library actions are still in development.
           "@ | Set-Content dist/README.txt
 
       - name: Install Inno Setup
@@ -43,7 +43,7 @@ jobs:
       - name: Build Windows installer
         shell: pwsh
         run: |
-          $iscc = "$env:ProgramFiles(x86)\Inno Setup 6\ISCC.exe"
+          $iscc = Join-Path ([Environment]::GetFolderPath("ProgramFilesX86")) "Inno Setup 6\ISCC.exe"
           if (!(Test-Path $iscc)) { throw "Inno Setup compiler not found at $iscc" }
           & $iscc "packaging/windows/MovieBoxDesktop.iss"
           if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
