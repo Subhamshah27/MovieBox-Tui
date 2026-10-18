@@ -22,7 +22,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build desktop app
-        run: cargo build --locked --release --bin moviebox-desktop
+        run: cargo build --release --bin moviebox-desktop
 
       - name: Package portable executable
         shell: pwsh
